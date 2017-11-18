@@ -14,6 +14,7 @@ if __name__ == "__main__":
     updater = Updater(token=environ["TELEGRAM_TOKEN"])
     dispatcher = updater.dispatcher
 
+    print("Agregando handlers...")
     for handler in HANDLERS:
         dispatcher.add_handler(handler)
 

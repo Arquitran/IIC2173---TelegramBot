@@ -14,7 +14,9 @@ requests>=2.18.1
 redis>=2.10.6
 ```
 
-The `TELEGRAM_TOKEN` environment variable must be set.
+The following environment variables must be set:
+- `TELEGRAM_TOKEN`
+- `API_URL`
 
 ## To start bot
 
