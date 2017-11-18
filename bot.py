@@ -1,12 +1,7 @@
 import logging
-from commands import start, buy
-from telegram.ext import Updater, CommandHandler
+from commands import HANDLERS
+from telegram.ext import Updater
 from os import environ
-
-
-def add_handlers(dispatcher, handlers):
-    for handler in handlers:
-        dispatcher.add_handler(CommandHandler(handler.__name__, handler))
 
 
 logging.basicConfig(
@@ -18,7 +13,12 @@ logging.basicConfig(
 if __name__ == "__main__":
     updater = Updater(token=environ["TELEGRAM_TOKEN"])
     dispatcher = updater.dispatcher
-    add_handlers(dispatcher, [start, buy])
+
+    for handler in HANDLERS:
+        dispatcher.add_handler(handler)
+
     updater.start_polling()
-    input("Press any key to stop bot")
+    print("To stop bot press CTRL + C (maybe repeatedly)")
+    updater.idle()
+    print("Stopping bot...")
     updater.stop()
