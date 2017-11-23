@@ -1,9 +1,9 @@
 from messages import BUY
 from telegram.ext import CommandHandler
+from os import environ
 import requests
 import json
 
-API_URL = 'https://arqss4.ing.puc.cl/api'
 QUEUE_URL = 'https://arqss5.ing.puc.cl'
 AMOUNT = 1
 
@@ -16,7 +16,7 @@ def buy_handler(bot, update, args, user_data):
     elif not(args):
         bot.send_message(
             chat_id=update.message.chat_id,
-            text= "Ingresa el nombre mediante: /buy \{producto\}")
+            text= "Ingresa el nombre mediante: /buy {producto}")
         return 2
     else:
         bot.send_message(
@@ -29,8 +29,8 @@ def buy_handler(bot, update, args, user_data):
             chat_id=update.message.chat_id,
             text="Producto invalido.")
         return 3
-    data = [{"product_id":product_id, "amount":AMOUNT}]
-    
+    data = [{"product_id":str(product_id), "amount":str(AMOUNT)}]
+    print(data)
     response = postProduct(data, user_data)    
     if response.status_code == 200:
         bot.send_message(
@@ -50,8 +50,6 @@ def buy_handler(bot, update, args, user_data):
 
 
 
-
-
 def getID(product_name):
     ACTION_URL = '/products'
     answer = requests.get(QUEUE_URL + ACTION_URL)
@@ -62,9 +60,10 @@ def getID(product_name):
     return -1
 
 def postProduct(data, user_data):
-    ACTION_URL = '/cart'
+    ACTION_URL = '/api/cart'
     header = {'Authorization':user_data['token']}
-    answer = requests.post(API_URL + ACTION_URL, json.dumps(data), headers = header )
+    print(data)
+    answer = requests.post(environ["API_URL"] + ACTION_URL, json.dumps(data), headers = header )
     print(answer)
     print(answer.text)
     return answer
