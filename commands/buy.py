@@ -1,6 +1,7 @@
 from messages import BUY
 from telegram.ext import CommandHandler
 import requests
+import json
 
 API_URL = 'https://arqss4.ing.puc.cl/api'
 QUEUE_URL = 'https://arqss5.ing.puc.cl'
@@ -11,12 +12,12 @@ def buy_handler(bot, update, args, user_data):
         bot.send_message(
             chat_id=update.message.chat_id,
             text='Debes realizar login mediante: /login')
-        return 0
+        return 1
     elif not(args):
         bot.send_message(
             chat_id=update.message.chat_id,
             text= "Ingresa el nombre mediante: /buy \{producto\}")
-        return 1
+        return 2
     else:
         bot.send_message(
             chat_id=update.message.chat_id,
@@ -27,13 +28,29 @@ def buy_handler(bot, update, args, user_data):
         bot.send_message(
             chat_id=update.message.chat_id,
             text="Producto invalido.")
-        return 2
+        return 3
     data = [{"product_id":product_id, "amount":AMOUNT}]
     
-    ## Falta continuar
-    print(data)
-    postProduct(data, user_data)
-    
+    response = postProduct(data, user_data)    
+    if response.status_code == 200:
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text="Producto procesado correctamente.")
+        return 0
+    elif response.status_code == 401:
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text="Ha ocurrido un error con las credenciales.")
+        return 4
+    else:
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text="Ha ocurrido un error inesperado.")
+        return 6
+
+
+
+
 
 def getID(product_name):
     ACTION_URL = '/products'
@@ -46,8 +63,10 @@ def getID(product_name):
 
 def postProduct(data, user_data):
     ACTION_URL = '/cart'
-    answer = requests.post(API_URL + ACTION_URL, data, headers={'Authorization':user_data['token']} )
+    header = {'Authorization':user_data['token']}
+    answer = requests.post(API_URL + ACTION_URL, json.dumps(data), headers = header )
     print(answer)
+    print(answer.text)
     return answer
 
 buy = CommandHandler("buy", buy_handler, pass_args=True, pass_user_data=True)
