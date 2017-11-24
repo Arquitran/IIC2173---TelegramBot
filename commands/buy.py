@@ -8,6 +8,9 @@ QUEUE_URL = 'https://arqss5.ing.puc.cl'
 AMOUNT = 1
 
 def buy_handler(bot, update, args, user_data):
+    print(args)
+    print(user_data)
+
     if not('token' in user_data.keys()):
         bot.send_message(
             chat_id=update.message.chat_id,
@@ -22,7 +25,7 @@ def buy_handler(bot, update, args, user_data):
         bot.send_message(
             chat_id=update.message.chat_id,
             text= "Buscando producto..")
-        
+
     product_id = getID(" ".join(args))
     if product_id == -1:
         bot.send_message(
@@ -31,7 +34,7 @@ def buy_handler(bot, update, args, user_data):
         return 3
     data = [{"product_id":str(product_id), "amount":str(AMOUNT)}]
     print(data)
-    response = postProduct(data, user_data)    
+    response = postProduct(data, user_data)
     if response.status_code == 200:
         bot.send_message(
             chat_id=update.message.chat_id,
@@ -62,8 +65,8 @@ def getID(product_name):
 def postProduct(data, user_data):
     ACTION_URL = '/api/cart'
     header = {'Authorization':user_data['token']}
-    print(data)
-    answer = requests.post(environ["API_URL"] + ACTION_URL, json.dumps(data), headers = header )
+
+    answer = requests.post(environ["API_URL"] + ACTION_URL, json=data, headers=header )
     print(answer)
     print(answer.text)
     return answer
